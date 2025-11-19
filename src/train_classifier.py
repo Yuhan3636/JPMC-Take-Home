@@ -78,19 +78,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data-path",
         type=str,
-        default="../data/censusbureau.data",
+        default="data/census-bureau.data",
         help="Path to censusbureau.data",
     )
     parser.add_argument(
         "--columns-path",
         type=str,
-        default="../data/census-bureau.columns",
+        default="data/census-bureau.columns",
         help="Path to census-bureau.columns",
     )
     parser.add_argument(
         "--model-out",
         type=str,
-        default="../classifier.joblib",
+        default="classifier.joblib",
         help="Where to save the trained model",
     )
     args = parser.parse_args()

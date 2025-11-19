@@ -4,7 +4,6 @@ import pandas as pd
 
 from sklearn.pipeline import Pipeline
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 
 from data_utils import load_raw_data, prepare_supervised_data, build_preprocessor
 
@@ -48,13 +47,7 @@ def fit_kmeans_segmentation(
     cluster_labels = kmeans_step.labels_
     df["cluster"] = cluster_labels
 
-    # 7. Optional: compute silhouette score to judge cluster separation
-    # We need the transformed feature space to compute it
-    X_transformed = cluster_pipeline.named_steps["preprocessor"].transform(X)
-    sil = silhouette_score(X_transformed, cluster_labels, sample_weight=w)
-    print(f"Silhouette score (higher is better): {sil:.4f}")
-
-    # 8. Basic cluster profiling: size, income rate, average age, etc.
+    # 7. Basic cluster profiling: size, income rate, average age, etc.
     print("\nCluster sizes (weighted):")
     weighted_sizes = df.groupby("cluster")["weight"].sum()
     print(weighted_sizes)
@@ -63,7 +56,8 @@ def fit_kmeans_segmentation(
     # y is 1 if high income
     df["high_income"] = y
     income_rate = df.groupby("cluster").apply(
-        lambda g: np.average(g["high_income"], weights=g["weight"])
+        lambda g: np.average(g["high_income"], weights=g["weight"]),
+        include_groups=False
     )
     print(income_rate)
 
@@ -106,13 +100,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data-path",
         type=str,
-        default="../data/censusbureau.data",
+        default="data/census-bureau.data",
         help="Path to censusbureau.data",
     )
     parser.add_argument(
         "--columns-path",
         type=str,
-        default="../data/census-bureau.columns",
+        default="data/census-bureau.columns",
         help="Path to census-bureau.columns",
     )
     parser.add_argument(
