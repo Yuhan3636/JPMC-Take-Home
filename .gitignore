@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+
+# Large data files
+data/*.data
+data/*.csv
+data/*.gz
+
+# Model artifacts
+*.joblib
+*.pkl
+
+# OS files
+.DS_Store
