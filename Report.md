@@ -24,7 +24,7 @@ Weights play a critical role:
 - Must be applied to classifier fit as sample weights
 
 
-# 3. Exploratory Data Analysis (EDA)
+# 3. Exploratory Data Analysis
 EDA is executed in 'EDA.py', which generates figures such as: 
 - Age distribution
 - Income label distribution
@@ -32,28 +32,41 @@ EDA is executed in 'EDA.py', which generates figures such as:
 - High-income rate by education
 
 ## 3.1 Key EDA Findings
+
 (1) Age Distribution
+
+![Age Distribution](figures/fig_age_hist.png)
+
 - Broad distribution from 0 to 90+.
 - A significant child and youth population is present.
 - Working-age peak at ~30–45.
 
 (2) Income Distribution
+
+![Income Distribution](figures/fig_income_dist.png)
+
 - Severely imbalanced:
 - Majority are ≤$50k
 - Small minority (≲10%) earn >$50k
 - This affects classifier recall and requires careful threshold tuning.
 
 (3) Education Distribution
+
+![Education Distribution](figures/fig_education_bar.png)
+
 Top categories:
 - High school graduate
 - Children
 - Some college
-- Bachelor’s degree
+- Bachelor's degree
 
 (4) Income vs Education
+
+![Income by Education](figures/fig_income_by_education.png)
+
 - Strong monotonic trend:
 - Higher education → higher high-income probability
-- Master’s degrees have >30% high-income rate
+- Master's degrees have >30% high-income rate
 - Lower schooling levels (7th–10th grade) produce near-zero high-income rate
 - Education is the single strongest predictor and dominates both segmentation and classification.
 
@@ -167,7 +180,7 @@ Interpretation:
     - Individuals with larger w_i have a greater influence on the model.
     - The classifier learns a function that reflects the weighted population,
       not the raw sample distribution.
-      
+
 ## 6.4 Training Procedure
 - Stratified 80/20 split, where 159618 for training and 39905 for testing 
 - Passing sample weights into .fit()
