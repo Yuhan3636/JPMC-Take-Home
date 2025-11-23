@@ -67,9 +67,19 @@ Use median imputation and standard scaling to ensure stable optimization and pre
 
 # 5. Segmentation Model
 ## 5.1 Mathematical Formulation
-KMeans solves:
-              min​_({μj​},{zi​})∑_(i=1)^n(​w_i​∥x_i​−μ_zi​​∥2)
-where x_i is preprocessed feature vector, w_i is survey weight, z_i is cluster assignment, and 𝜇_i is cluster centroid. 
+Weighted K-Means Objective
+    Minimize   sum_i [ w_i * || x_i - μ_{z_i} ||^2 ]
+
+Assignment:
+    z_i = argmin_j  || x_i - μ_j ||^2
+
+Centroid update (weighted mean):
+    μ_j = ( sum_{i in cluster j} w_i * x_i ) / ( sum_{i in cluster j} w_i )
+
+Interpretation:
+    - w_i increases the influence of individual i.
+    - Centroids become population-representative.
+    - Cluster boundaries reflect weighted distances.
 
 ## 5.2 Cluster results
 | Cluster | Pop-weight (millions) | High-income rate | Interpretation                                                    |
@@ -142,10 +152,22 @@ Gradient Boosting was chosen because:
 - performs well on tabular census-like data
 
 ## 6.3 Objective Function
-The classifier minimizes:
-                          ∑_(i=1)^n w_i​l(y_i​,f(x_i​))
-where w_i is survey weights, and l is logistic loss. 
+Weighted Loss Objective
+-----------------------
 
+Minimize:     sum_i [ w_i * ℓ(y_i, f(x_i)) ]
+
+Where:
+    - w_i is the survey weight for individual i
+    - y_i is the true income label (0 or 1)
+    - f(x_i) is the model's predicted probability for class 1
+    - ℓ(·) is the logistic loss function
+
+Interpretation:
+    - Individuals with larger w_i have a greater influence on the model.
+    - The classifier learns a function that reflects the weighted population,
+      not the raw sample distribution.
+      
 ## 6.4 Training Procedure
 - Stratified 80/20 split, where 159618 for training and 39905 for testing 
 - Passing sample weights into .fit()
