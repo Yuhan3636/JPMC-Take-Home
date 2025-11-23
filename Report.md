@@ -1,15 +1,15 @@
-1. Introduction
+## 1. Introduction
 
 This project develops two core machine-learning models:
 (1) A supervised income classifier predicting whether an individual earns >$50,000 using 40+ demographic and employment features.
 (2) A customer segmentation model that clusters individuals into well-defined groups that are demographically and economically meaningful.
 
-2. Dataset Structure & Assumptions
-2.1 Dataset Shape
+## 2. Dataset Structure & Assumptions
+# 2.1 Dataset Shape
 - 199,523 rows (each row = one CPS respondent)
 - 42 columns total: 41 features, 1 label (“- 50000.” or “50000+.”), Weight column representing population counts
 
-2.2 Data Source
+# 2.2 Data Source
 The data resembles 1994–1995 Current Population Survey microdata. It contains:
 Type	   Count	  Examples
 Numeric	    13	     age, capital gains, wage per hour, employer count
@@ -17,21 +17,21 @@ Categorical	28	     education, marital status, sex, race, occupation code
 Weight	     1	     “weight”
 Label	     1	     income category
 
-2.3 Survey Weights
+# 2.3 Survey Weights
 Weights play a critical role:
 - Must be applied in cluster size estimation
 - Must be applied in income rate per cluster
 - Must be applied to classifier fit as sample weights
 
 
-3. Exploratory Data Analysis (EDA)
+## 3. Exploratory Data Analysis (EDA)
 EDA is executed in 'EDA.py', which generates figures such as: 
 - Age distribution
 - Income label distribution
 - Education frequency
 - High-income rate by education
 
-3.1 Key EDA Findings
+# 3.1 Key EDA Findings
 (1) Age Distribution
 - Broad distribution from 0 to 90+.
 - A significant child and youth population is present.
@@ -55,30 +55,31 @@ Top categories:
 - Higher education → higher high-income probability
 - Master’s degrees have >30% high-income rate
 - Lower schooling levels (7th–10th grade) produce near-zero high-income rate
+- Education is the single strongest predictor and dominates both segmentation and classification.
 
-Education is the single strongest predictor and dominates both segmentation and classification.
-
-4. Data Preprocessing & Feature Engineering
-4.1 Numeric Features
+## 4. Data Preprocessing & Feature Engineering
+# 4.1 Numeric Features
 Use median imputation and standard scaling to ensure stable optimization and prevents capital gains/losses variables from dominating clustering and boosting splits. 
 
-4.2 Categorical Features
+# 4.2 Categorical Features
 - Impute missing categories as explicit “missing” token
 - One-hot encoding
 
-5. Segmentation Model
-5.1 Mathematical Formulation
+## 5. Segmentation Model
+# 5.1 Mathematical Formulation
 KMeans solves:
               min​_({μj​},{zi​})∑_(i=1)^n(​w_i​∥x_i​−μ_zi​​∥2)
 where x_i is preprocessed feature vector, w_i is survey weight, z_i is cluster assignment, and 𝜇_i is cluster centroid. 
 
-5.2 Cluster results
-Cluster	Pop-weight(millions)	High-income rate	Interpretation
-0	    75.1M	                13.0%	            Mid-aged, mixed education, moderate income
-1	    80.5M	                1.7%	            Older, lower-income, many widowed
-2	    74.8M	                11.7%	            Mid-aged, similar to cluster 0 but slightly different composition
-3	    88.1M	                0%	                Children / youth
-4	    28.7M	                8.2%	            Early-career adults
+# 5.2 Cluster results
+| Cluster | Pop-weight (millions) | High-income rate | Interpretation                                                    |
+| ------- | --------------------- | ---------------- | ----------------------------------------------------------------- |
+| 0       | 75.1M                 | 13.0%            | Mid-aged, mixed education, moderate income                        |
+| 1       | 80.5M                 | 1.7%             | Older, lower-income, many widowed                                 |
+| 2       | 74.8M                 | 11.7%            | Mid-aged, similar to cluster 0 but slightly different composition |
+| 3       | 88.1M                 | 0%               | **Children / youth**                                              |
+| 4       | 28.7M                 | 8.2%             | Early-career adults                                               |
+
 
 Noting that we assign k = 5 because high-income rates vary sharply:
 | Cluster | High-income rate |
@@ -173,6 +174,17 @@ Confusion Matrix:
 
 7.3 Error Analysis
 False negatives (high-income predicted as low-income) are large in count because the dataset is severely imbalanced.
+
+
+8. Alternatives for classifier
+| Alternative         | Pros                   | Why not primary                                                      |
+| ------------------- | ---------------------- | -------------------------------------------------------------------- |
+| Logistic Regression | Interpretable baseline | Underfits nonlinear tabular structure; weaker AUC                    |
+| Random Forest       | Solid baseline         | Less calibrated probabilities; less sensitive to subtle interactions |
+| SVM                 | Strong margin method   | Poor scaling with 200k × sparse one-hot matrix                       |
+| Neural nets         | Flexible               | Needs embeddings & tuning; often worse on tabular without heavy work |
+| Naive Bayes         | Fast                   | Violates feature independence, poor accuracy                         |
+
 
 
 8. Business Implications & Deployment Strategy
